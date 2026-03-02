@@ -1,6 +1,6 @@
 # RoomieWatch
 
-Privacy-first motion surveillance that runs on your laptop. Detects motion, captures snapshots, streams live — all local, no cloud.
+Privacy-first roommate surveillance that runs on your laptop. Detects motion, captures snapshots, streams live — all local, no cloud.
 
 Built because I don't trust my roommate.
 
