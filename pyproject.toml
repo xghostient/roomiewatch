@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "roomiewatch"
-version = "0.1.0"
+version = "0.1.1"
 description = "Privacy-first motion surveillance that runs on your laptop. Detects motion, captures snapshots, streams live — all local, no cloud."
 readme = "README.md"
 license = "MIT"

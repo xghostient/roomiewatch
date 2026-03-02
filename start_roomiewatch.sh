@@ -25,6 +25,7 @@ SENSITIVITY=3
 COOLDOWN=5
 DURATION=""             # leave empty for unlimited, or set e.g. DURATION=420 for 7 hours
 CAMERA=0
+MAX_CAPTURES=1000       # max snapshots to keep (0=unlimited)
 MAX_RESTARTS=10         # give up after this many restarts in one session
 RESTART_DELAY=5         # seconds to wait before restarting
 ENABLE_TAILSCALE=true   # set to false if you don't want Tailscale remote access
@@ -96,7 +97,8 @@ if [ "$STREAM_ENABLED" = true ] && [ "$ENABLE_TAILSCALE" = true ]; then
         if [ -n "$TAILSCALE_IP" ]; then
             log "═══════════════════════════════════════════"
             log "TAILSCALE ACTIVE"
-            log "REMOTE ACCESS URL: http://$TAILSCALE_IP:$PORT"
+            log "For remote access, run in another terminal:"
+            log "  tailscale serve $PORT"
             log "═══════════════════════════════════════════"
         else
             log "Tailscale is installed but not connected."
@@ -123,6 +125,8 @@ build_cmd() {
     if [ -n "$DURATION" ]; then
         cmd="$cmd --duration $DURATION"
     fi
+
+    cmd="$cmd --max-captures $MAX_CAPTURES"
 
     echo "$cmd"
 }

@@ -4,6 +4,14 @@ Privacy-first motion surveillance that runs on your laptop. Detects motion, capt
 
 Built because I don't trust my roommate.
 
+## Why
+
+You move to a new city. You get a room with strangers who are yet to become friends. Getting a good roommate is blissful — but what if you don't? You want to know what happens in your room when you're away at work.
+
+Cloud cameras send your footage to someone else's server. Cheap IP cams have known vulnerabilities. Most "smart" security wants a subscription. RoomieWatch runs entirely on your machine — your webcam, your disk, your network. Nothing leaves your laptop unless you explicitly set up remote access via Tailscale.
+
+I hope you never need this package. But if you do — it works.
+
 ## Features
 
 - **Motion detection** — OpenCV-based frame diffing with configurable sensitivity
@@ -17,7 +25,7 @@ Built because I don't trust my roommate.
 ## Install
 
 ```bash
-pip install roomiewatch
+pipx install roomiewatch
 ```
 
 Or from source:
@@ -56,10 +64,17 @@ brew install tailscale
 sudo brew services start tailscale
 tailscale up
 
+# Start roomiewatch (localhost only — not visible on your network)
+roomiewatch --stream
+
+# In another terminal, expose via Tailscale only
+tailscale serve 8080
+
 # Install Tailscale on your phone, sign in with the same account
-# Then open: http://<tailscale-ip>:8080
-tailscale ip -4  # shows your machine's Tailscale IP
+# Open the Tailscale URL shown by `tailscale serve`
 ```
+
+The stream never touches your local network — only devices signed into your Tailscale account can reach it.
 
 **Why Tailscale over Cloudflare Tunnel?** Cloudflare terminates TLS at their edge — your images pass through their servers in plaintext. Tailscale is direct device-to-device WireGuard encryption. Nobody sees your footage.
 
@@ -81,12 +96,14 @@ chmod +x start_roomiewatch.sh
 |------|---------|-------------|
 | `--stream` | off | Enable live web dashboard |
 | `--port` | 8080 | Web server port |
+| `--expose` | off | Bind to all interfaces (0.0.0.0) instead of localhost |
 | `--sensitivity` | 3 | Motion threshold % (higher = less sensitive) |
 | `--cooldown` | 5 | Seconds between captures |
 | `--duration` | unlimited | Auto-stop after N minutes |
 | `--camera` | 0 | Camera index |
 | `--no-sound` | off | Disable alert beep |
 | `--no-snapshots` | off | Stream only, don't save to disk |
+| `--max-captures` | 1000 | Max snapshots to keep; oldest auto-deleted (0=unlimited) |
 | `--caffeinate` | off | Prevent system sleep (macOS + Linux) |
 
 ## How It Works

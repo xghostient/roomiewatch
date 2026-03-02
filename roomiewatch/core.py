@@ -6,7 +6,6 @@ import cv2
 import numpy as np
 import time
 import os
-import sys
 import argparse
 import platform
 import subprocess
@@ -17,12 +16,7 @@ import socket
 from datetime import datetime, timedelta
 from roomiewatch import __version__
 
-# Flask is optional — only needed for streaming
-try:
-    from flask import Flask, Response, render_template_string, jsonify
-    FLASK_AVAILABLE = True
-except ImportError:
-    FLASK_AVAILABLE = False
+from flask import Flask, Response, render_template_string, jsonify, send_from_directory
 
 
 # ─── Config ──────────────────────────────────────────────────────────────────
@@ -79,13 +73,15 @@ def beep():
     system = platform.system()
     try:
         if system == "Darwin":
-            os.system("afplay /System/Library/Sounds/Sosumi.aiff &")
+            subprocess.Popen(["afplay", "/System/Library/Sounds/Sosumi.aiff"],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         elif system == "Linux":
-            os.system("paplay /usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga 2>/dev/null &")
+            subprocess.Popen(["paplay", "/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga"],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         elif system == "Windows":
             import winsound
             winsound.Beep(880, 300)
-    except:
+    except Exception:
         pass
 
 
@@ -419,11 +415,6 @@ class RoomieWatch:
 
     def start_web_server(self):
         """Start Flask web server in a background thread."""
-        if not FLASK_AVAILABLE:
-            log("Flask not installed. Run: pip install flask", "WARN")
-            log("Continuing without web stream...", "WARN")
-            return
-
         app = Flask(__name__)
         app.logger.disabled = True
 
@@ -464,7 +455,6 @@ class RoomieWatch:
 
         @app.route('/captures/<filename>')
         def serve_capture(filename):
-            from flask import send_from_directory
             return send_from_directory(watcher.capture_dir, filename)
 
         # Check if port is available before starting
@@ -644,12 +634,6 @@ def main():
     parser.add_argument("--caffeinate", action="store_true",
                         help="Prevent system sleep (macOS: caffeinate, Linux: systemd-inhibit)")
     args = parser.parse_args()
-
-    if args.stream and not FLASK_AVAILABLE:
-        log("Flask is required for streaming. Installing...", "WARN")
-        os.system(f"{sys.executable} -m pip install flask")
-        log("Please restart roomiewatch", "INFO")
-        return
 
     caff_proc = None
     if args.caffeinate:
