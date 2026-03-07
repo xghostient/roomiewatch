@@ -2,7 +2,7 @@
 
 Privacy-first roommate surveillance that runs on your laptop. Detects motion, captures snapshots, streams live — all local, no cloud.
 
-Built because I don't trust my roommate.
+Built because I don't trust my roommate, house help, or maintenance folks.
 
 ## Why
 
